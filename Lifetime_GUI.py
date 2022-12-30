@@ -23,7 +23,7 @@ from rich import print
 from MPL_Shared.Temperature_Controller import Temperature_Controller
 from MPL_Shared.Temperature_Controller_Settings import TemperatureControllerSettingsWindow
 from MPL_Shared.SQL_Controller import Commit_XY_Blob_Data_To_SQL, Connect_To_SQL
-from MPL_Shared.IV_Measurement_Assistant import IV_Controller
+from MPL_Shared.IV_Measurement_Assistant import KeysightB2962A, Keithley236
 from MPL_Shared.Async_Iterator import Quitting_Early_Exception, Run_Func_Async, Get_Quit_Early_Flag
 from MPL_Shared.Saveable_Session import Saveable_Session
 
@@ -85,7 +85,7 @@ class Lifetime_Measurement_Assistant_App( QtWidgets.QWidget, Ui_MainWindow, Save
 		self.quit_early = Get_Quit_Early_Flag()
 		status_layout = self.connectionsStatusDisplay_widget.layout()
 		subsystems = self.Make_Subsystems( self, status_layout,
-		                                   IV_Controller( machine_type="Keysight" ),
+		                                   KeysightB2962A(),
 		                                   Temperature_Controller( resource_path( "configuration.ini" ) ) )
 		self.iv_controller, self.temp_controller = subsystems
 		# self.Setup_DSO()
@@ -240,6 +240,9 @@ class Lifetime_Measurement_Assistant_App( QtWidgets.QWidget, Ui_MainWindow, Save
 	def Start_Measurement( self ):
 		# Update button to reuse it for stopping measurement
 		try:
+			# if self.dso is None:
+			# 	print("Got Here")
+			# 	yield Exception( "DSO Not Started" )
 			self.Save_Session( resource_path( "session.ini" ) )
 			self.quit_early.clear()
 			self.measurement = Measurement_Sweep_Runner( self, self.Stop_Measurement, self.quit_early, Measurement_Sweep,
